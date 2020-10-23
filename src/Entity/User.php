@@ -4,9 +4,15 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @UniqueEntity(
+ *     fields = {"email"},
+ *     message = "Cette adresse email existe déja"
+ * )
  */
 class User
 {
@@ -19,6 +25,10 @@ class User
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Length(
+     *     min = 8,
+     *     minMessage = "Mot de passe trop court"
+     * )
      */
     private $email;
 
@@ -31,6 +41,14 @@ class User
      * @ORM\Column(type="string", length=255)
      */
     private $password;
+
+    /**
+     * @Assert\EqualTo(
+     *     propertyPath = "password",
+     *     message = "Mot de passe doit etre identique"
+     * )
+     */
+    private $confirmPassword;
 
     public function getId(): ?int
     {
@@ -69,6 +87,18 @@ class User
     public function setPassword(string $password): self
     {
         $this->password = $password;
+
+        return $this;
+    }
+
+    public function getConfirmPassword(): ?string
+    {
+        return $this->confirmPassword;
+    }
+
+    public function setConfirmPassword(string $confirmPassword): self
+    {
+        $this->confirmPassword = $confirmPassword;
 
         return $this;
     }
